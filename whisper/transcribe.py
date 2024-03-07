@@ -279,7 +279,7 @@ def transcribe(
             segment_duration = segment_size * HOP_LENGTH / SAMPLE_RATE
             mel_segment = pad_or_trim(mel_segment, N_FRAMES).to(model.device).to(dtype)
 
-            if initial_prompt is not None:
+            if add_hotwords_token is not None:
                 print("add hotwords token prompt")
                 add_hotwords_token = []
                 add_hotwords_token.extend(tokenizer.encode(" " + hotwords.strip()))
