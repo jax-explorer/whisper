@@ -612,7 +612,7 @@ class DecodingTask:
                     hotwords_tokens = hotwords_tokens[: self.n_ctx // 2 - 1]
             tokens = (
                 [self.tokenizer.sot_prev]
-                + hotwords_tokens if self.options.hotwords is not None else []
+                + (hotwords_tokens if self.options.hotwords is not None else [])
                 + prompt_tokens[-(self.n_ctx // 2 - 1) :]
                 + tokens
             )
