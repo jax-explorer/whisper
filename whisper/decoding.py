@@ -514,7 +514,7 @@ class DecodingTask:
 
     def __init__(self, model: "Whisper", options: DecodingOptions):
         self.model = model
-
+        print("DecodingTask init")
         language = options.language or "en"
         tokenizer = get_tokenizer(
             model.is_multilingual,
