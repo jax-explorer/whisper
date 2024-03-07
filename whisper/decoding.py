@@ -607,7 +607,7 @@ class DecodingTask:
             )
             if (hotwords := self.options.hotwords) and not self.options.prefix:
                 print(f"hotwords: {hotwords}")
-                hotwords_tokens = self.tokenizer.encode(" " + hotwords)
+                hotwords_tokens = self.tokenizer.encode(" " + hotwords.strip())
                 if len(hotwords_tokens) >= self.n_ctx // 2:
                     hotwords_tokens = hotwords_tokens[: self.n_ctx // 2 - 1]
             tokens = (
@@ -616,6 +616,7 @@ class DecodingTask:
                 + prompt_tokens[-(self.n_ctx // 2 - 1) :]
                 + tokens
             )
+            print(self.tokenizer.decode(tokens))
 
         return tuple(tokens)
 
