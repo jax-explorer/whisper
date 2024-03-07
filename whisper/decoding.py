@@ -599,7 +599,7 @@ class DecodingTask:
                 prefix_tokens = prefix_tokens[-max_prefix_len:]
             tokens = tokens + prefix_tokens
 
-        if prompt := self.options.prompt:
+        if (prompt := self.options.prompt) or ((self.options.hotwords) and not self.options.prefix):
             prompt_tokens = (
                 self.tokenizer.encode(" " + prompt.strip())
                 if isinstance(prompt, str)
@@ -610,10 +610,11 @@ class DecodingTask:
                 hotwords_tokens = self.tokenizer.encode(" " + hotwords.strip())
                 if len(hotwords_tokens) >= self.n_ctx // 2:
                     hotwords_tokens = hotwords_tokens[: self.n_ctx // 2 - 1]
+            
             tokens = (
                 [self.tokenizer.sot_prev]
                 + (hotwords_tokens if self.options.hotwords is not None else [])
-                + prompt_tokens[-(self.n_ctx // 2 - 1) :]
+                + (prompt_tokens[-(self.n_ctx // 2 - 1) :] if self.options.prompt is not None else [])
                 + tokens
             )
             print(self.tokenizer.decode(tokens))
