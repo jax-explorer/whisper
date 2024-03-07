@@ -280,10 +280,10 @@ def transcribe(
             mel_segment = pad_or_trim(mel_segment, N_FRAMES).to(model.device).to(dtype)
 
             if hotwords is not None:
-                print("add hotwords token prompt")
+                print(f"add hotwords token prompt, {" " + hotwords.strip()}")
                 add_hotwords_token = []
                 add_hotwords_token.extend(tokenizer.encode(" " + hotwords.strip()))
-                add_hotwords_token.extend(all_tokens[prompt_reset_since:])
+                # add_hotwords_token.extend(all_tokens[prompt_reset_since:])
             decode_options["prompt"] = add_hotwords_token if hotwords else all_tokens[prompt_reset_since:]
             result: DecodingResult = decode_with_fallback(mel_segment)
             tokens = torch.tensor(result.tokens)
