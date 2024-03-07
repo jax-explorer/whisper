@@ -51,7 +51,7 @@ def transcribe(
     append_punctuations: str = "\"'.。,，!！?？:：”)]}、",
     clip_timestamps: Union[str, List[float]] = "0",
     hallucination_silence_threshold: Optional[float] = None,
-    hotwords: Optional[str],
+    hotwords: Optional[str] = None,
     **decode_options,
 ):
     """
