@@ -112,6 +112,7 @@ class DecodingOptions:
 
     # implementation details
     fp16: bool = True  # use fp16 for most of the calculation
+    hotwords: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -604,8 +605,13 @@ class DecodingTask:
                 if isinstance(prompt, str)
                 else prompt
             )
+            if hotwords := self.options.hotwords and not self.options.prefix:
+                hotwords_tokens = self.tokenizer.encode(" " + hotwords)
+                if len(hotwords_tokens) >= self.max_length // 2:
+                    hotwords_tokens = hotwords_tokens[: self.max_length // 2 - 1]
             tokens = (
                 [self.tokenizer.sot_prev]
+                + hotwords_tokens if self.options.hotwords is not None else []
                 + prompt_tokens[-(self.n_ctx // 2 - 1) :]
                 + tokens
             )
