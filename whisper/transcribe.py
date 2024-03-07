@@ -51,6 +51,7 @@ def transcribe(
     append_punctuations: str = "\"'.。,，!！?？:：”)]}、",
     clip_timestamps: Union[str, List[float]] = "0",
     hallucination_silence_threshold: Optional[float] = None,
+    hotwords: Optional[str],
     **decode_options,
 ):
     """
@@ -112,6 +113,9 @@ def transcribe(
     hallucination_silence_threshold: Optional[float]
         When word_timestamps is True, skip silent periods longer than this threshold (in seconds)
         when a possible hallucination is detected
+    
+    hotwords: Optional[str]
+            optional hotwords to provide as a prompt for the all window.
 
     Returns
     -------
@@ -275,7 +279,11 @@ def transcribe(
             segment_duration = segment_size * HOP_LENGTH / SAMPLE_RATE
             mel_segment = pad_or_trim(mel_segment, N_FRAMES).to(model.device).to(dtype)
 
-            decode_options["prompt"] = all_tokens[prompt_reset_since:]
+            if hotwords:
+                add_hotwords_token = []
+                add_hotwords_token.extend(tokenizer.encode(" " + hotwords.strip()))
+                add_hotwords_token.extend(all_tokens[prompt_reset_since:])
+            decode_options["prompt"] = add_hotwords_token if hotwords else all_tokens[prompt_reset_since:]
             result: DecodingResult = decode_with_fallback(mel_segment)
             tokens = torch.tensor(result.tokens)
 
@@ -546,6 +554,8 @@ def cli():
     parser.add_argument("--threads", type=optional_int, default=0, help="number of threads used by torch for CPU inference; supercedes MKL_NUM_THREADS/OMP_NUM_THREADS")
     parser.add_argument("--clip_timestamps", type=str, default="0", help="comma-separated list start,end,start,end,... timestamps (in seconds) of clips to process, where the last end timestamp defaults to the end of the file")
     parser.add_argument("--hallucination_silence_threshold", type=optional_float, help="(requires --word_timestamps True) skip silent periods longer than this threshold (in seconds) when a possible hallucination is detected")
+    parser.add_argument("--hotwords", type=str, default=None, help="optional hotwords to provide as a prompt for the all window.")
+
     # fmt: on
 
     args = parser.parse_args().__dict__
